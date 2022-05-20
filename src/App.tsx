@@ -43,9 +43,9 @@ function App() {
     return "";
   }
 
-  function getSolvedField() {
-
-  }
+  // function getSolvedField() {
+  //
+  // }
 
   return (
     <div className="App">
