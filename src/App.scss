@@ -1,0 +1,14 @@
+body {
+  background-color: rgb(11, 19, 27);
+}
+
+.App {
+  text-align: center;
+  color: white;
+
+  .app_layer {
+    margin: 0 auto;
+    padding: 8px;
+    max-width: 1140px;
+  }
+}
