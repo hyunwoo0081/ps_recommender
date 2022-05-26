@@ -5,6 +5,11 @@
 
 알고리즘을 공부할 때 적절한 문제를 고르는데 도움을 줄 수 있습니다.
 
+[Demo Page](https://hyunwoo0081.github.io/ps_recommender/)
+
+
+## 추천 방식
+
 
 ## License
 Rank, Class 등 이미지에 대한 저작권은 [solved.ac](https://solved.ac)에 있습니다.

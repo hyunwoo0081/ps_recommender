@@ -38,7 +38,7 @@ const UserSearchPopup = ({addUser, canceled} :Iprops) => {
       <div>
         <h1>닉네임 검색</h1>
         <div className="input_layer">
-          <input id="user_search_input" type="text" onChange={changeSearchName} placeholder="아이디를 입력하세요" value={searchName}/>
+          <input id="user_search_input" autoComplete="off" type="text" onChange={changeSearchName} placeholder="아이디를 입력하세요" value={searchName}/>
           <button onClick={() => canceled()}>X</button>
         </div>
         {showSearchedList()}

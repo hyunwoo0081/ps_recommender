@@ -12,3 +12,12 @@ body {
     max-width: 1140px;
   }
 }
+
+button {
+  &.toggle_button {
+    padding: 5px;
+    &.selected {
+      border: orangered solid 1px;
+    }
+  }
+}
