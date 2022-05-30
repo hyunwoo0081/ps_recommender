@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import UserSearchCard from "./UserSearchCard";
-import 'styles/UserSearchPopup.scss';
+import 'container/styles/UserSearchPopup.scss';
+import Fetch from "../controller/Fetch";
 
 interface Iprops {
   addUser :Function
@@ -16,16 +17,14 @@ const UserSearchPopup = ({addUser, canceled} :Iprops) => {
     setSearchName(name);
 
     if (!!name) {
-      fetch(`https://solved.ac/api/v3/search/suggestion?query=${name}`)
-        .then((response) => response.json())
-                .then((data) => setUserArray(data["users"]));
+      Fetch.getUserSuggestion(name, setUserArray);
     }
     else {
       setUserArray([]);
     }
   }
 
-  function showSearchedList() {
+  function widgetsSearchedList() {
     const result = [];
     for (let user of userArray) {
       result.push(<UserSearchCard name={user["handle"]} rank={user["tier"]} handle={addUser} />);
@@ -38,10 +37,15 @@ const UserSearchPopup = ({addUser, canceled} :Iprops) => {
       <div>
         <h1>닉네임 검색</h1>
         <div className="input_layer">
-          <input id="user_search_input" autoComplete="off" type="text" onChange={changeSearchName} placeholder="아이디를 입력하세요" value={searchName}/>
+          <input id="user_search_input"
+                 type="text"
+                 autoComplete="off"
+                 value={searchName}
+                 placeholder="아이디를 입력하세요"
+                 onChange={changeSearchName}/>
           <button onClick={() => canceled()}>X</button>
         </div>
-        {showSearchedList()}
+        {widgetsSearchedList()}
       </div>
     </div>
   );

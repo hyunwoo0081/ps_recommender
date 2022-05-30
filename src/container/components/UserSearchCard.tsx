@@ -1,5 +1,6 @@
 import React from 'react';
-import 'styles/UserSearchCard.scss';
+import 'container/styles/UserSearchCard.scss';
+import Fetch from "../controller/Fetch";
 
 interface Iprops {
   name:string,
@@ -9,11 +10,7 @@ interface Iprops {
 
 const UserSearchCard = ({name, rank, handle} :Iprops) => {
   function delayedAddUser() {
-    fetch(`https://solved.ac/api/v3/user/problem_tag_stats?handle=${name}&sort=problemCount`)
-      .then((response) => response.json())
-      .then((data) => {
-        handle(name, rank, data.items);
-      });
+    Fetch.getSolvedProblems(name, (data: object) => handle(name, rank, data));
   }
 
   return (

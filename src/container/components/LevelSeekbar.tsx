@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import 'styles/LevelSeekbar.scss';
+import 'container/styles/LevelSeekbar.scss';
 
 interface Iprops {
   handle:Function

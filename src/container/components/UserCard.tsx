@@ -1,5 +1,5 @@
 import React from 'react';
-import 'styles/UserCard.scss'
+import 'container/styles/UserCard.scss'
 
 interface Iprops {
   name:string,

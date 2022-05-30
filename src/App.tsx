@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 import UserSearchPopup from "./container/components/UserSearchPopup";
-import UserCard from "container/components/UserCard";
-import './styles/App.scss';
 import LevelSeekbar from "./container/components/LevelSeekbar";
+import UserCard from "container/components/UserCard";
+import './container/styles/App.scss';
+import Fetch from "./container/controller/Fetch";
 
 interface UserInfo {
   name: string,
   rank: number,
-  solvedField: number[],
+  solvedField: number[][],
 }
 
 interface TagName {
@@ -16,36 +17,65 @@ interface TagName {
 }
 
 function App() {
+  const [ProblemCounts, setProblemCounts]: [ProblemCounts: number, setProblemCounts: Function] = useState(192);
   const [userInfo, setUserInfo]: [userName: Array<UserInfo>, setUserName: Function] = useState([]);
   const [isSearchPopupOpened, openUserSearch] = useState(false);
   const [tryNewField, setTryNewField] = useState(false);
   const [tagCounts, setTagCounts]: [tagCounts: Array<number>, setTagCounts: Function] = useState([]);
   const [tagName, setTagName]: [tagName: Array<TagName>, setTagName: Function] = useState([]);
+  const [tagToIndex, setTagToIndex]: [tagToIndex: any, setTagToIndex: Function] = useState({});
 
   //`https://solved.ac/api/v3/user/show?handle=${name}`
   //`https://solved.ac/api/v3/tag/list`
   //`https://solved.ac/api/v3/user/problem_tag_stats?handle=${name}&sort=problemCount`
+  //`https://solved.ac/api/v3/search/problem?query=@${name}&sort=level&direction=desc`
+  function init() {
+    if (tagName.length === 0) {
+      Fetch.getTagsList((data: any) => {
+        let pCount;
+        setProblemCounts(pCount = data.length);
+
+        let names = [];
+        let indexes = {};
+
+        for (let i = 0; i < pCount; i++) {
+          let item = data[i];
+          let key = item.tag.key;
+          let ko = item.tag.displayNames[0].name;
+          names.push({"key": key, "ko": ko});
+          indexes = { ...indexes, [key]: i };
+        }
+        setTagCounts(Array.from({length: pCount}, () => 0))
+        setTagName(names);
+        setTagToIndex(indexes);
+      });
+    }
+  }
+  init();
 
   function addUserAndClosePopup(name: string, rank: number, solvedData: any[]) {
-    let solvedCounts = [];
+    let solvedLevelSum = Array.from({length: ProblemCounts}, () => 0);
+    let solvedCounts = Array.from({length: ProblemCounts}, () => 0);
 
-    if (tagName.length === 0) {
-      for (let item of solvedData) {
-        tagName.push({"key": item.tag.key, "ko": item.tag.displayNames[0].name});
-        tagCounts.push(0);
+    for (let item of solvedData) {
+      for (let tag of item.tags) {
+        let i = tagToIndex[tag.key];
+
+        if (solvedCounts[i] === 0)
+          tagCounts[i]++;
+
+        if (solvedCounts[i] < 30) {
+          solvedCounts[i]++;
+          solvedLevelSum[i] += item.level;
+        }
       }
-      setTagName(tagName);
     }
-
-    for (let key in solvedData) {
-      solvedCounts.push(solvedData[key].solved);
-      if (solvedCounts[key] > 0) tagCounts[key]++;
-    }
+    console.log(tagCounts);
     setTagCounts(tagCounts);
 
     setUserInfo([
       ...userInfo,
-      {name: name, rank: rank, solvedField: solvedCounts}
+      {name: name, rank: rank, solvedField: [solvedLevelSum, solvedCounts]}
     ]);
     openUserSearch(false);
   }
@@ -55,7 +85,7 @@ function App() {
     if (userData === undefined) return;
 
     for (let key in userData.solvedField) {
-      if (userData.solvedField[key] > 0)
+      if (userData.solvedField[1][key] > 0)
         tagCounts[key]--;
     }
     setTagCounts(tagCounts);
@@ -120,6 +150,7 @@ function App() {
           {tryNewField &&
               <>
                 <h2>주제 선택</h2>
+                <input type="text" placeholder="주제를 검색해주세요"/>
                 <ul>
                   {widgetsFieldList(tryNewField)}
                 </ul>
