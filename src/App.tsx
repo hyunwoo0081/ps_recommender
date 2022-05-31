@@ -1,14 +1,17 @@
 import React, {useState} from 'react';
 import UserSearchPopup from "./container/components/UserSearchPopup";
 import LevelSeekbar from "./container/components/LevelSeekbar";
+import TagSearchView from "./container/components/TagSearchView";
 import UserCard from "container/components/UserCard";
+import FieldCard from "./container/components/FieldCard";
 import './container/styles/App.scss';
 import Fetch from "./container/controller/Fetch";
+import LevelCalculator from "./container/controller/LevelCalculator";
 
 interface UserInfo {
   name: string,
   rank: number,
-  solvedField: number[][],
+  solvedField: Array<{ levelSum: number, count: number }>,
 }
 
 interface TagName {
@@ -24,6 +27,9 @@ function App() {
   const [tagCounts, setTagCounts]: [tagCounts: Array<number>, setTagCounts: Function] = useState([]);
   const [tagName, setTagName]: [tagName: Array<TagName>, setTagName: Function] = useState([]);
   const [tagToIndex, setTagToIndex]: [tagToIndex: any, setTagToIndex: Function] = useState({});
+  // search params
+  const [problemLevel, setProblemLevel]: [problemLevel: number, setProblemLevel: Function] = useState(2);
+  const [searchField, setSearchField]: [searchField: Array<number>, setSearchField: Function] = useState([]);
 
   //`https://solved.ac/api/v3/user/show?handle=${name}`
   //`https://solved.ac/api/v3/tag/list`
@@ -54,19 +60,21 @@ function App() {
   init();
 
   function addUserAndClosePopup(name: string, rank: number, solvedData: any[]) {
-    let solvedLevelSum = Array.from({length: ProblemCounts}, () => 0);
-    let solvedCounts = Array.from({length: ProblemCounts}, () => 0);
+    openUserSearch(false);
+    if (userInfo.some((x) => x.name === name)) return;
+
+    let solvedArr = Array.from({length: ProblemCounts}, () => {return {"levelSum": 0, "count": 0}});
 
     for (let item of solvedData) {
       for (let tag of item.tags) {
-        let i = tagToIndex[tag.key];
+        let tagId = tagToIndex[tag.key];
 
-        if (solvedCounts[i] === 0)
-          tagCounts[i]++;
+        if (solvedArr[tagId].count === 0)
+          tagCounts[tagId]++;
 
-        if (solvedCounts[i] < 30) {
-          solvedCounts[i]++;
-          solvedLevelSum[i] += item.level;
+        if (solvedArr[tagId].count < 30) {
+          solvedArr[tagId].count++;
+          solvedArr[tagId].levelSum += item.level;
         }
       }
     }
@@ -75,9 +83,8 @@ function App() {
 
     setUserInfo([
       ...userInfo,
-      {name: name, rank: rank, solvedField: [solvedLevelSum, solvedCounts]}
+      {name: name, rank: rank, solvedField: solvedArr}
     ]);
-    openUserSearch(false);
   }
 
   function deleteUser(name: string) {
@@ -85,7 +92,7 @@ function App() {
     if (userData === undefined) return;
 
     for (let key in userData.solvedField) {
-      if (userData.solvedField[1][key] > 0)
+      if (userData.solvedField[key].count > 0)
         tagCounts[key]--;
     }
     setTagCounts(tagCounts);
@@ -93,6 +100,27 @@ function App() {
     setUserInfo(userInfo.filter(element => element.name !== name));
   }
 
+  function addSearchField(tagId: number) {
+    setSearchField(Array.from(new Set([...searchField, tagId])));
+  }
+
+  function deleteSearchField(tagId: number) {
+    setSearchField(searchField.filter(element => element !== tagId));
+  }
+
+  function changeProblemLevel(level: number) {
+    setProblemLevel(level);
+  }
+
+  function findProblems() {
+    LevelCalculator.analyzeUserData(userInfo);
+    let result = LevelCalculator.getLevelRange(searchField, problemLevel);
+
+    console.log(result);
+    //range 받고, 문제 추적하기...
+  }
+
+  //get Widgets
   function widgetsUserCards() {
     let result = [];
     for (let info of userInfo)
@@ -101,20 +129,24 @@ function App() {
     return result;
   }
 
-  function widgetsFieldList(newField: boolean) {
-    if (userInfo.length === 0) return null;
-
+  function widgetsLevelButtons() {
     let result = [];
-    for (let key in tagName)
-      if (tagCounts[key] === userInfo.length)
-        result.push(<li>{tagName[key].ko}</li>);
+    const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
 
+    for (let i = 0; i < 5; i++) {
+      result.push(<button className={problemLevel === i ? "toggle_button selected" : "toggle_button"}
+                          onClick={() => changeProblemLevel(i)}>{text[i]}</button>);
+    }
     return result;
   }
 
-  function setLevels() {
-
-    return "";
+  function widgetsFieldCard() {
+    let result = [];
+    for (let i of searchField) {
+      let tag = tagName[i];
+      result.push(<FieldCard key={i} tagName={tag.ko} tagKey={tag.key} deleteTag={() => deleteSearchField(i)}/>);
+    }
+    return result;
   }
 
   return (
@@ -133,7 +165,7 @@ function App() {
           {widgetsUserCards()}
 
           <button className="add_user"
-                  onClick={ () => openUserSearch(true) }>
+                  onClick={() => openUserSearch(true)}>
           +</button>
         </div>
 
@@ -150,16 +182,19 @@ function App() {
           {tryNewField &&
               <>
                 <h2>주제 선택</h2>
-                <input type="text" placeholder="주제를 검색해주세요"/>
-                <ul>
-                  {widgetsFieldList(tryNewField)}
-                </ul>
+                <TagSearchView tagList={tagName} addTag={addSearchField}/>
+                {widgetsFieldCard()}
               </>
           }
 
           <h2>난이도 선택</h2>
-          <LevelSeekbar handle={setLevels}/>
+          {widgetsLevelButtons()}
+          { ProblemCounts === 0 &&
+            <LevelSeekbar handle={changeProblemLevel}/>
+          }
         </div>
+
+        <button onClick={findProblems}>문제 찾기</button>
 
         {
           <h2>추천 문제</h2>
