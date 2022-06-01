@@ -40,13 +40,13 @@ const LevelCalculator = {
     this.stdDev = stdDev;
   },
   getLevelRange(tagIds: Array<number>, problemLevel: number) {
-    let result = [];
+    let result = [0, 30];
     // 일단 평균에서 +- 해서 내보내자
+    // 일단 마지막값으로 보냄, 나중에 로직 수정바람
     for (let id of tagIds) {
-      let range = [Math.floor(this.mean[id])+problemLevel-2, Math.ceil(this.mean[id])+problemLevel-2];
-      range[0] = Math.max(0, range[0]);
-      range[1] = Math.max(0, range[1]);
-      result.push(range);
+      let result = [Math.floor(this.mean[id])+problemLevel-2, Math.ceil(this.mean[id])+problemLevel-2];
+      result[0] = Math.min(Math.max(1, result[0]), 30);
+      result[1] = Math.min(Math.max(1, result[1]), 30);
     }
     return result;
   }

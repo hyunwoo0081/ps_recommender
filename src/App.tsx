@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
+
 import UserSearchPopup from "./container/components/UserSearchPopup";
 import LevelSeekbar from "./container/components/LevelSeekbar";
 import TagSearchView from "./container/components/TagSearchView";
 import UserCard from "container/components/UserCard";
 import FieldCard from "./container/components/FieldCard";
-import './container/styles/App.scss';
+
 import Fetch from "./container/controller/Fetch";
 import LevelCalculator from "./container/controller/LevelCalculator";
+
+import './container/styles/App.scss';
 
 interface UserInfo {
   name: string,
@@ -30,11 +33,9 @@ function App() {
   // search params
   const [problemLevel, setProblemLevel]: [problemLevel: number, setProblemLevel: Function] = useState(2);
   const [searchField, setSearchField]: [searchField: Array<number>, setSearchField: Function] = useState([]);
+  const [problemResult, setProblemResult]: [problemResult: Array<any>, setProblemResult: Function] = useState([]);
 
   //`https://solved.ac/api/v3/user/show?handle=${name}`
-  //`https://solved.ac/api/v3/tag/list`
-  //`https://solved.ac/api/v3/user/problem_tag_stats?handle=${name}&sort=problemCount`
-  //`https://solved.ac/api/v3/search/problem?query=@${name}&sort=level&direction=desc`
   function init() {
     if (tagName.length === 0) {
       Fetch.getTagsList((data: any) => {
@@ -46,8 +47,8 @@ function App() {
 
         for (let i = 0; i < pCount; i++) {
           let item = data[i];
-          let key = item.tag.key;
-          let ko = item.tag.displayNames[0].name;
+          let key = item.key;
+          let ko = item.displayNames[0].name;
           names.push({"key": key, "ko": ko});
           indexes = { ...indexes, [key]: i };
         }
@@ -78,6 +79,7 @@ function App() {
         }
       }
     }
+    console.log(solvedData.length);
     console.log(tagCounts);
     setTagCounts(tagCounts);
 
@@ -114,10 +116,19 @@ function App() {
 
   function findProblems() {
     LevelCalculator.analyzeUserData(userInfo);
-    let result = LevelCalculator.getLevelRange(searchField, problemLevel);
+    let range = LevelCalculator.getLevelRange(searchField, problemLevel);
 
-    console.log(result);
-    //range 받고, 문제 추적하기...
+    // make solved.ac query
+    let query = "";
+    for (let user of userInfo)
+      query += "!%40"+user.name+"%26";
+    for (let i in searchField)
+      query += "%23"+tagName[i].key+"%26";
+    query += "*"+range[0]+".."+range[1];
+
+    Fetch.getRandomProblems100(query, (data: Array<any>) => {
+      setProblemResult(data);
+    });
   }
 
   //get Widgets
@@ -146,6 +157,20 @@ function App() {
       let tag = tagName[i];
       result.push(<FieldCard key={i} tagName={tag.ko} tagKey={tag.key} deleteTag={() => deleteSearchField(i)}/>);
     }
+    return result;
+  }
+
+  function widgetsSearchedProblems() {
+    let result = [];
+    for (let problem of problemResult) {
+      result.push(<li><a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target='_blank' rel="noreferrer">
+        {problem.problemId+" = "+problem.titleKo+"  "+problem.level+"  "+problem.acceptedUserCount}
+      </a></li>);
+    }
+
+    if (problemResult.length === 0)
+      result.push(<li>조건을 만족하는 문제가 없습니다</li>)
+
     return result;
   }
 
@@ -196,10 +221,10 @@ function App() {
 
         <button onClick={findProblems}>문제 찾기</button>
 
-        {
-          <h2>추천 문제</h2>
-        }
-
+        <h2>추천 문제</h2>
+        <ul>
+          {widgetsSearchedProblems()}
+        </ul>
       </div>
     </div>
   );

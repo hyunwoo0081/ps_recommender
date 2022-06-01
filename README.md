@@ -10,6 +10,12 @@
 
 ## 추천 방식
 
+## 기술 스택
+
+| React.js                                                                                                                                                                     |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://ko.reactjs.org/"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUlR1AfuW3JJkBrY52Tqoo-s-nxuLLB3pvYA&usqp=CAU" width="50" height="50"></a> |
+| ^18.1.0                                                                                                                                                                      |
 
 ## License
 Rank, Class 등 이미지에 대한 저작권은 [solved.ac](https://solved.ac)에 있습니다.
