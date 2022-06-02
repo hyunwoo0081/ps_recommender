@@ -1,0 +1,261 @@
+$HighlightColor: #17CE3A;
+$NotSelectedColor: #E0E0E0;
+
+h2 {
+  font-size: 36px;
+}
+
+h5 {
+  margin: 0;
+}
+
+h6 {
+  margin: 0;
+  font-weight: normal;
+  color: #686868;
+}
+
+button {
+  width: 145px;
+  height: 40px;
+  padding: 5px;
+  margin: 5px;
+
+  color: white;
+  font-size: 16px;
+  border-radius: 4px;
+  border-color: transparent;
+  background-color: $HighlightColor;
+
+  &.toggle_button {
+    color: black;
+    background-color: $NotSelectedColor;
+
+    &.selected {
+      color: white;
+      background-color: $HighlightColor;
+    }
+  }
+}
+
+.navigation_bar {
+  height: 64px;
+
+  .navigation_layout {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    position: fixed;
+    width: 100%;
+    height: 64px;
+    padding: 0 20px;
+    margin-bottom: 10px;
+    z-index: 2;
+
+    background-color: white;
+    -webkit-box-shadow: 0 0 15px 1px rgba(0,0,0,0.27);
+    box-shadow: 0 0 15px 1px rgba(0,0,0,0.27);
+
+    h1 {
+      font-size: 20px;
+    }
+  }
+}
+
+.search_bar_layout {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+
+  img {
+    width: 24px;
+    height: 24px;
+    margin: 8px;
+  }
+
+  .input_layer {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 600px;
+    height: 40px;
+
+    border: 1px solid #686868;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px 0 rgba(0,0,0,0.08);
+    box-shadow: inset 0 1px 1px 0 rgba(0,0,0,0.08);
+
+    input {
+      all: unset;
+      width: 600-60px;
+      text-align: left;
+      font-size: 14px;
+      display: block;
+      padding: 0 4px;
+    }
+  }
+
+  .searched_layer {
+    position: absolute;
+    top: 46px;
+    width: 600px;
+    z-index: 1;
+
+    font-size: 20px;
+    background-color: white;
+    border: 1px solid #686868;
+    border-radius: 4px;
+
+    .search_card_layout {
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      padding: 4px;
+
+      img {
+        width: 20px;
+        height: 20px;
+        margin: 4px;
+      }
+
+      h5 {
+        padding-left: 2px;
+      }
+
+      h6 {
+        padding-left: 4px;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.level_seekbar {
+  margin: 50px auto;
+  position: relative;
+  width: calc(100% - 100px);
+  height: 10px;
+  background: #929292;
+  border-radius: 5px;
+
+  .circle {
+    cursor: grab;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 30px;
+    height: 30px;
+    background: $HighlightColor;
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+
+    span {
+      position: absolute;
+      display: block;
+      width: 30px;
+      line-height: 30px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+  }
+
+}
+
+.user_card {
+  display: inline-block;
+  position: relative;
+  width: 160px;
+  height: 240px;
+  margin: 40px 40px;
+
+  border-radius: 4px;
+  -webkit-box-shadow: 0 2px 10px 2px rgba(0,0,0,0.23);
+  box-shadow: 0 2px 10px 2px rgba(0,0,0,0.23);
+
+  .img_layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 240-70px;
+
+    animation: CardBackground 6s ease infinite;
+    border-radius: 4px 4px 0 0;
+    border: $NotSelectedColor solid 1px;
+    border-bottom: none;
+
+    img {
+      width: 64px;
+      height: 64px;
+      margin: 10px;
+
+      //background-color: #27E2A4;
+      //background-color: #EC9A00;
+      filter: drop-shadow(0 0 16px #FFC944)
+    }
+
+    &.un { background: linear-gradient(-45deg, #666666, #2D2D2D, #040202); background-size: 200% 200%; }
+    &.br { background: linear-gradient(-45deg, #F49347, #984400, #492000); background-size: 200% 200%; }
+    &.si { background: linear-gradient(-45deg, #939195, #6B7E91, #1F354A); background-size: 200% 200%; }
+    &.go { background: linear-gradient(-45deg, #FFC944, #FFAF44, #FF9632); background-size: 200% 200%; }
+    &.pl { background: linear-gradient(-45deg, #8CC584, #45B2D3, #51A795); background-size: 200% 200%; }
+    &.di { background: linear-gradient(-45deg, #96B8DC, #3EA5DB, #4D6399); background-size: 200% 200%; }
+    &.ru { background: linear-gradient(-45deg, #E45B62, #E14476, #CA0059); background-size: 200% 200%; }
+    &.ma { background: linear-gradient(-45deg, #83f8fe, #b297fc, #fc7ea8); background-size: 200% 200%; }
+  }
+
+  .info_layer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    padding: 6px;
+
+    text-align: left;
+    background-color: white;
+    border-radius: 0 0 4px 4px;
+    border: $NotSelectedColor solid 1px;
+    border-top: none;
+
+    h5 {
+      font-size: 16px;
+      color: #212121;
+    }
+
+    h6 {
+      font-size: 10px;
+      color: #929292;
+    }
+  }
+
+  button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    background: none;
+
+    img {
+      width: 24px;
+      height: 24px;
+      padding: 7px;
+    }
+  }
+}
+
+@keyframes CardBackground {
+  0%{background-position:0 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0 50%}
+}

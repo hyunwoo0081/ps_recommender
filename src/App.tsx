@@ -1,31 +1,34 @@
 import React, {useState} from 'react';
 
-import UserSearchPopup from "./container/components/UserSearchPopup";
-import LevelSeekbar from "./container/components/LevelSeekbar";
-import TagSearchView from "./container/components/TagSearchView";
+import NavigationBar from "./container/components/NavigationBar";
+import UserSearchBar from "./container/components/UserSearchBar";
+import TagSearchBar from "./container/components/TagSearchBar";
+import LevelSeekbar from "container/components/LevelSeekbar";
 import UserCard from "container/components/UserCard";
-import FieldCard from "./container/components/FieldCard";
+import FieldCard from "container/components/FieldCard";
+import ToggleButton from "./container/components/ToggleButton";
 
-import Fetch from "./container/controller/Fetch";
-import LevelCalculator from "./container/controller/LevelCalculator";
+import Fetch from "container/controller/Fetch";
+import LevelCalculator from "container/controller/LevelCalculator";
 
-import './container/styles/App.scss';
+import 'container/styles/App.scss';
+import 'container/styles/Widgets.scss'
 
 interface UserInfo {
-  name: string,
-  rank: number,
-  solvedField: Array<{ levelSum: number, count: number }>,
+  name: string
+  rank: number
+  solvedCount: number
+  solvedField: Array<{ levelSum: number, count: number }>
 }
 
 interface TagName {
-  key: string,
-  ko: string,
+  key: string
+  ko: string
 }
 
 function App() {
   const [ProblemCounts, setProblemCounts]: [ProblemCounts: number, setProblemCounts: Function] = useState(192);
   const [userInfo, setUserInfo]: [userName: Array<UserInfo>, setUserName: Function] = useState([]);
-  const [isSearchPopupOpened, openUserSearch] = useState(false);
   const [tryNewField, setTryNewField] = useState(false);
   const [tagCounts, setTagCounts]: [tagCounts: Array<number>, setTagCounts: Function] = useState([]);
   const [tagName, setTagName]: [tagName: Array<TagName>, setTagName: Function] = useState([]);
@@ -60,8 +63,7 @@ function App() {
   }
   init();
 
-  function addUserAndClosePopup(name: string, rank: number, solvedData: any[]) {
-    openUserSearch(false);
+  function addUserAndClosePopup(name: string, rank: number, solvedCount: number, solvedData: any[]) {
     if (userInfo.some((x) => x.name === name)) return;
 
     let solvedArr = Array.from({length: ProblemCounts}, () => {return {"levelSum": 0, "count": 0}});
@@ -79,13 +81,11 @@ function App() {
         }
       }
     }
-    console.log(solvedData.length);
-    console.log(tagCounts);
     setTagCounts(tagCounts);
 
     setUserInfo([
       ...userInfo,
-      {name: name, rank: rank, solvedField: solvedArr}
+      {name: name, rank: rank, solvedCount: solvedCount, solvedField: solvedArr}
     ]);
   }
 
@@ -135,7 +135,7 @@ function App() {
   function widgetsUserCards() {
     let result = [];
     for (let info of userInfo)
-      result.push(<UserCard name={info.name} rank={info.rank} deleteHandler={deleteUser}/>);
+      result.push(<UserCard name={info.name} rank={info.rank} solvedCount={info.solvedCount} deleteHandler={deleteUser}/>);
 
     return result;
   }
@@ -145,8 +145,8 @@ function App() {
     const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
 
     for (let i = 0; i < 5; i++) {
-      result.push(<button className={problemLevel === i ? "toggle_button selected" : "toggle_button"}
-                          onClick={() => changeProblemLevel(i)}>{text[i]}</button>);
+      result.push(<ToggleButton checked={problemLevel === i} title={text[i]}
+                          onClick={() => changeProblemLevel(i)}/>);
     }
     return result;
   }
@@ -176,47 +176,34 @@ function App() {
 
   return (
     <div className="App">
-      {isSearchPopupOpened &&
-          <UserSearchPopup
-              addUser={addUserAndClosePopup}
-              canceled={() => openUserSearch(false)}
-          />
-      }
+      <NavigationBar/>
 
       <div className="app_layer">
-        <h1>Solved.ac 문제 추천</h1>
-        <h2>사용자 입력</h2>
+        <h2>문제 검색</h2>
+
+        <UserSearchBar addUserData={addUserAndClosePopup}/>
+
         <div className="users_layout">
           {widgetsUserCards()}
-
-          <button className="add_user"
-                  onClick={() => openUserSearch(true)}>
-          +</button>
         </div>
 
         <div className="search_setting_layout">
-          <h2>알고리즘 선택 기준</h2>
-          <button className={tryNewField ? "toggle_button" : "toggle_button selected"}
-                  onClick={() => setTryNewField(false)}>
-            풀 수 있는 문제 랜덤
-          </button>
-          <button className={tryNewField ? "toggle_button selected" : "toggle_button"}
-                  onClick={() => setTryNewField(true)}>
-            주제 선택 후 랜덤
-          </button>
-          {tryNewField &&
-              <>
-                <h2>주제 선택</h2>
-                <TagSearchView tagList={tagName} addTag={addSearchField}/>
-                {widgetsFieldCard()}
-              </>
-          }
+          <div>
+            <ToggleButton checked={!tryNewField} title="풀 수 있는 태그"
+                          onClick={() => setTryNewField(false)}/>
+            <ToggleButton checked={tryNewField} title="태그 선택"
+                          onClick={() => setTryNewField(true)}/>
 
-          <h2>난이도 선택</h2>
+            { tryNewField &&
+                <div className="tag_list_layout">
+                    <TagSearchBar tagList={tagName} addTag={addSearchField}/>
+                  {widgetsFieldCard()}
+                </div>
+            }
+          </div>
+
           {widgetsLevelButtons()}
-          { ProblemCounts === 0 &&
-            <LevelSeekbar handle={changeProblemLevel}/>
-          }
+          <LevelSeekbar handle={changeProblemLevel}/>
         </div>
 
         <button onClick={findProblems}>문제 찾기</button>

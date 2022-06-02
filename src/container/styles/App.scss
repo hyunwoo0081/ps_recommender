@@ -1,10 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background-color: rgb(11, 19, 27);
+  background-color: white;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: black;
 }
 
 .App {
   text-align: center;
-  color: white;
 
   .app_layer {
     margin: 0 auto;
@@ -13,11 +18,10 @@ body {
   }
 }
 
-button {
-  &.toggle_button {
-    padding: 5px;
-    &.selected {
-      border: orangered solid 1px;
-    }
-  }
+.users_layout {
+  height: 320px;
+}
+
+.tag_list_layout {
+  margin: 10px 0 36px;
 }
