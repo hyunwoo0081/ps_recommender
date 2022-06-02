@@ -1,14 +1,14 @@
 import React from 'react';
 
 import SearchBar from "./SearchBar";
-import NameImg from "../static/name.png";
-import Fetch from "../controller/Fetch";
+import NameImg from "container/static/name.png";
+import Fetch from "container/controller/Fetch";
 
 interface Iprops {
-  addUserData :Function
+  addUserFrame: Function
 }
 
-const UserSearchBar = ({addUserData} :Iprops) => {
+const UserSearchBar = ({addUserFrame}: Iprops) => {
   let userList: Array<any> = [];
 
   function changeSearchName(name: string, setSearched: Function) {
@@ -24,10 +24,30 @@ const UserSearchBar = ({addUserData} :Iprops) => {
   }
 
   function addHandle(index: number) {
-    let name = userList[index].handle;
-    let rank = userList[index].tier;
-    let solvedCount = userList[index].solvedCount;
-    Fetch.getSolvedProblems(name, (data: object) => addUserData(name, rank, solvedCount, data));
+    let user = userList[index];
+    let userFrame = addUserFrame(user.handle, user.tier, user.solvedCount);
+    if (userFrame == null) return;
+
+    let [userObj, tagCounts, setTagCounts, tagToIndex, updateUserList] = userFrame;
+
+    Fetch.getSolvedProblems(user.handle, (data: Array<any>) => {
+      let userSolvedList = userObj.solvedField;
+
+      for (let item of data) {
+        for (let tag of item.tags) {
+          let tagId = tagToIndex[tag.key];
+
+          if (userSolvedList[tagId].count === 0)
+            tagCounts[tagId]++;
+
+          if (userSolvedList[tagId].count < 30) {
+            userSolvedList[tagId].count++;
+            userSolvedList[tagId].levelSum += item.level;
+          }
+        }
+      }
+      setTagCounts(tagCounts);
+    }, updateUserList);
   }
 
   return (

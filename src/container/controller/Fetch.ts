@@ -11,8 +11,8 @@ const Fetch = {
         handle(data.items);
       });
   },
-  getSolvedProblems(name: string, handle: Function) {
-    this.getAllProblems(`@${name}&sort=level&direction=desc`, [], 1, handle);
+  getSolvedProblems(name: string, updateFunc: Function, finishFunc: Function) {
+    this.getAllProblems(`@${name}&sort=level&direction=desc`, 1, updateFunc, finishFunc);
   },
   getRandomProblems100(query: string, handle: Function) {
     query = `https://solved.ac/api/v3/search/problem?query=${query}&page=1&sort=random&direction=asc`;
@@ -23,14 +23,16 @@ const Fetch = {
         handle(data.items);
       });
   },
-  getAllProblems(query: string, list: Array<any>, page: number, handle: Function) {
+  getAllProblems(query: string, page: number, updateFunc: Function, finishFunc: Function) {
     fetch(`https://solved.ac/api/v3/search/problem?query=${query}&page=${page}`)
       .then((response) => response.json())
       .then((data) => {
+        updateFunc(data.items);
+
         if(page < data.count / 100)
-          this.getAllProblems(query, [...list, ...data.items], page+1, handle);
+          this.getAllProblems(query, page+1, updateFunc, finishFunc);
         else
-          handle([...list, ...data.items]);
+          finishFunc();
       });
   }
 };

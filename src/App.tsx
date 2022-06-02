@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 
-import NavigationBar from "./container/components/NavigationBar";
-import UserSearchBar from "./container/components/UserSearchBar";
-import TagSearchBar from "./container/components/TagSearchBar";
+import NavigationBar from "container/components/NavigationBar";
+import UserSearchBar from "container/components/UserSearchBar";
+import TagSearchBar from "container/components/TagSearchBar";
 import LevelSeekbar from "container/components/LevelSeekbar";
 import UserCard from "container/components/UserCard";
 import FieldCard from "container/components/FieldCard";
-import ToggleButton from "./container/components/ToggleButton";
+import ToggleButton from "container/components/ToggleButton";
 
 import Fetch from "container/controller/Fetch";
 import LevelCalculator from "container/controller/LevelCalculator";
@@ -29,6 +29,7 @@ interface TagName {
 function App() {
   const [ProblemCounts, setProblemCounts]: [ProblemCounts: number, setProblemCounts: Function] = useState(192);
   const [userInfo, setUserInfo]: [userName: Array<UserInfo>, setUserName: Function] = useState([]);
+  const [userUpdated, setUserUpdated]: [userUpdated: Array<boolean>, setUserUpdated: Function] = useState([]);
   const [tryNewField, setTryNewField] = useState(false);
   const [tagCounts, setTagCounts]: [tagCounts: Array<number>, setTagCounts: Function] = useState([]);
   const [tagName, setTagName]: [tagName: Array<TagName>, setTagName: Function] = useState([]);
@@ -63,30 +64,17 @@ function App() {
   }
   init();
 
-  function addUserAndClosePopup(name: string, rank: number, solvedCount: number, solvedData: any[]) {
-    if (userInfo.some((x) => x.name === name)) return;
+  function addUserFrame(name: string, rank: number, solvedCount: number) {
+    if (userInfo.some((x) => x.name === name))
+      return null;
 
-    let solvedArr = Array.from({length: ProblemCounts}, () => {return {"levelSum": 0, "count": 0}});
+    let solvedArr = Array.from({length: ProblemCounts}, () => ({ levelSum: 0, count: 0 }));
+    let userObj = {name: name, rank: rank, solvedCount: solvedCount, solvedField: solvedArr};
 
-    for (let item of solvedData) {
-      for (let tag of item.tags) {
-        let tagId = tagToIndex[tag.key];
+    setUserInfo([...userInfo, userObj]);
+    setUserUpdated([...userUpdated, false]);
 
-        if (solvedArr[tagId].count === 0)
-          tagCounts[tagId]++;
-
-        if (solvedArr[tagId].count < 30) {
-          solvedArr[tagId].count++;
-          solvedArr[tagId].levelSum += item.level;
-        }
-      }
-    }
-    setTagCounts(tagCounts);
-
-    setUserInfo([
-      ...userInfo,
-      {name: name, rank: rank, solvedCount: solvedCount, solvedField: solvedArr}
-    ]);
+    return [userObj, tagCounts, setTagCounts, tagToIndex, () => setUserUpdated([...userUpdated, true])];
   }
 
   function deleteUser(name: string) {
@@ -134,8 +122,10 @@ function App() {
   //get Widgets
   function widgetsUserCards() {
     let result = [];
-    for (let info of userInfo)
-      result.push(<UserCard name={info.name} rank={info.rank} solvedCount={info.solvedCount} deleteHandler={deleteUser}/>);
+    for (let i in userInfo) {
+      let info = userInfo[i];
+      result.push(<UserCard user={info} userUpdated={userUpdated[i]} deleteHandler={deleteUser}/>);
+    }
 
     return result;
   }
@@ -155,17 +145,22 @@ function App() {
     let result = [];
     for (let i of searchField) {
       let tag = tagName[i];
-      result.push(<FieldCard key={i} tagName={tag.ko} tagKey={tag.key} deleteTag={() => deleteSearchField(i)}/>);
+      result.push(<FieldCard key={i} tag={tag} deleteTag={() => deleteSearchField(i)}/>);
     }
     return result;
   }
 
   function widgetsSearchedProblems() {
     let result = [];
+    //`https://www.acmicpc.net/problem/${problem.problemId}`
+    // problem.isLevelLocked //standard problem
     for (let problem of problemResult) {
-      result.push(<li><a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target='_blank' rel="noreferrer">
-        {problem.problemId+" = "+problem.titleKo+"  "+problem.level+"  "+problem.acceptedUserCount}
-      </a></li>);
+      result.push(<tr>
+        <td>{problem.level+ "/" + problem.problemId}</td>
+        <td>{problem.titleKo}</td>
+        <td>{problem.acceptedUserCount}</td>
+        <td>{problem.averageTries}</td>
+      </tr>);
     }
 
     if (problemResult.length === 0)
@@ -181,7 +176,7 @@ function App() {
       <div className="app_layer">
         <h2>문제 검색</h2>
 
-        <UserSearchBar addUserData={addUserAndClosePopup}/>
+        <UserSearchBar addUserFrame={addUserFrame}/>
 
         <div className="users_layout">
           {widgetsUserCards()}
@@ -196,8 +191,10 @@ function App() {
 
             { tryNewField &&
                 <div className="tag_list_layout">
-                    <TagSearchBar tagList={tagName} addTag={addSearchField}/>
-                  {widgetsFieldCard()}
+                  <TagSearchBar tagList={tagName} addTag={addSearchField}/>
+                  <div className="tag_list">
+                    {widgetsFieldCard()}
+                  </div>
                 </div>
             }
           </div>
@@ -209,9 +206,16 @@ function App() {
         <button onClick={findProblems}>문제 찾기</button>
 
         <h2>추천 문제</h2>
-        <ul>
+        <table>
+          <tr>
+            <th>#</th>
+            <th>제목</th>
+            <th>해결</th>
+            <th>평균 시도</th>
+          </tr>
+
           {widgetsSearchedProblems()}
-        </ul>
+        </table>
       </div>
     </div>
   );

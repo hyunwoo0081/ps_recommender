@@ -24,4 +24,11 @@ body {
 
 .tag_list_layout {
   margin: 10px 0 36px;
+
+  .tag_list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }

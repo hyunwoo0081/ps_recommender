@@ -90,10 +90,11 @@ button {
     input {
       all: unset;
       width: 600-60px;
-      text-align: left;
-      font-size: 14px;
       display: block;
       padding: 0 4px;
+
+      text-align: left;
+      font: 14px 'Noto Sans KR', sans-serif;
     }
   }
 
@@ -226,8 +227,14 @@ button {
     border-top: none;
 
     h5 {
+      cursor: pointer;
       font-size: 16px;
       color: #212121;
+
+      &:hover {
+        text-decoration: underline;
+        text-decoration-color: #212121;
+      }
     }
 
     h6 {
@@ -250,6 +257,66 @@ button {
       width: 24px;
       height: 24px;
       padding: 7px;
+    }
+  }
+}
+
+.tag_card {
+  $widgetHeight: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: $widgetHeight;
+  margin: 10px 10px;
+
+  border-radius: 20px;
+  background-color: rgb(247, 248, 249);
+  border: 1px solid rgb(221, 223, 224);
+
+
+  h5 {
+    font-size: 16px;
+  }
+  h6 {
+    padding-left: 4px;
+    font-size: 12px;
+    color: rgb(138, 143, 149);
+  }
+  span {
+    color: black;
+  }
+
+  img {
+    width: $widgetHeight;
+    height: $widgetHeight;
+    padding: 6px;
+  }
+
+  button {
+    width: fit-content;
+    background: none;
+    margin: 0;
+    padding: 0;
+    img {
+      width: $widgetHeight;
+      height: $widgetHeight;
+      padding: 12px;
+    }
+  }
+
+}
+
+table {
+  width: 100%;
+  border-bottom: #2D2D2D solid 1px;
+  tr {
+    td {
+      text-align: left;
+
+      &:nth-child(3), &:nth-child(4) {
+        text-align: right;
+      }
     }
   }
 }
