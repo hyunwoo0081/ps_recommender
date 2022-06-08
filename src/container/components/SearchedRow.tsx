@@ -12,12 +12,14 @@ const SearchedRow = ({problem} :Iprops) => {
       <td>
         <div>
           <img src={`https://static.solved.ac/tier_small/${problem.level}.svg`} alt={problem.level}/>
-          <a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target="_blank" rel="noreferrer">{problem.problemId}</a>
+          <a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target="_blank" rel="noreferrer">
+            {problem.problemId}</a>
         </div>
       </td>
       <td>
         <div>
-          <a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target="_blank" rel="noreferrer">{problem.titleKo}</a>
+          <a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target="_blank" rel="noreferrer">
+            {problem.titleKo}</a>
           { problem.isLevelLocked &&
             <div className="searched_standard">STANDARD</div>
           }

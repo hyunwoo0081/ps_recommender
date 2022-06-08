@@ -140,17 +140,6 @@ function App() {
     return result;
   }
 
-  function widgetsLevelButtons() {
-    let result = [];
-    const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
-
-    for (let i = 0; i < 5; i++) {
-      result.push(<ToggleButton checked={problemLevel === i} title={text[i]}
-                                onClick={() => changeProblemLevel(i)}/>);
-    }
-    return result;
-  }
-
   return (
     <div className="App">
       <NavigationBar/>
@@ -181,8 +170,7 @@ function App() {
             }
           </div>
 
-          {widgetsLevelButtons()}
-          <LevelSeekbar handle={changeProblemLevel}/>
+          <LevelSeekbar value={problemLevel} handle={changeProblemLevel}/>
         </div>
 
         <button onClick={findProblems}>문제 찾기</button>

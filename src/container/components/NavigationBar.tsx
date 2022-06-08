@@ -7,7 +7,6 @@ const NavigationBar = () => {
         <h1>문제 추천</h1>
       </div>
     </div>
-
   );
 }
 

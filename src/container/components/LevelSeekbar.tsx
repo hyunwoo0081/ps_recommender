@@ -1,30 +1,37 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 interface Iprops {
+  value: number
   handle:Function
 }
 
-const LevelSeekbar = ({handle} :Iprops) => {
-  const [x, setX] = useState(0);
-
-  function onDrag(e :any) {
-    e = e || window.event;
-    e.preventDefault();
-
-    let elmnt = document.querySelector(".circle");
-    if (elmnt === null) return;
-    console.log(e);
-    setX(e.clientX - e.target.offsetLeft);
+const LevelSeekbar = ({value, handle} :Iprops) => {
+  function onChange(e: any) {
+    const val = e.target.value;
+    handle(val);
   }
 
-  function onDragEnd(e :any) {
-    setX(e.clientX - e.target.offsetLeft);
-    console.log("finished", e);
+  function widgetsLabel() {
+    let result = [];
+    const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
+    for (let label of text)
+      result.push(<p>{label}</p>);
+
+    return result;
   }
 
   return (
-    <div className="level_seekbar" draggable="true" onDrag={onDrag} onDragEnd={onDragEnd}>
-      <div className="circle" style={{left: x+"px"}}/>
+    <div className="level_seekbar">
+      <input type="range"
+             min="0"
+             max="4"
+             step="number"
+             list="seekbar_list"
+             value={value}
+             onChange={onChange}/>
+      <div className="label_layout">
+        {widgetsLabel()}
+      </div>
     </div>
   );
 }

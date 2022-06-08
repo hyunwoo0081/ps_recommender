@@ -33,5 +33,4 @@ const SearchedList = ({problemList} :Iprops) => {
   );
 }
 
-
 export default SearchedList;
