@@ -7,6 +7,7 @@ import LevelSeekbar from "container/components/LevelSeekbar";
 import UserCard from "container/components/UserCard";
 import FieldCard from "container/components/FieldCard";
 import ToggleButton from "container/components/ToggleButton";
+import SearchedList from "./container/components/SearchedList";
 
 import Fetch from "container/controller/Fetch";
 import LevelCalculator from "container/controller/LevelCalculator";
@@ -130,17 +131,6 @@ function App() {
     return result;
   }
 
-  function widgetsLevelButtons() {
-    let result = [];
-    const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
-
-    for (let i = 0; i < 5; i++) {
-      result.push(<ToggleButton checked={problemLevel === i} title={text[i]}
-                          onClick={() => changeProblemLevel(i)}/>);
-    }
-    return result;
-  }
-
   function widgetsFieldCard() {
     let result = [];
     for (let i of searchField) {
@@ -150,22 +140,14 @@ function App() {
     return result;
   }
 
-  function widgetsSearchedProblems() {
+  function widgetsLevelButtons() {
     let result = [];
-    //`https://www.acmicpc.net/problem/${problem.problemId}`
-    // problem.isLevelLocked //standard problem
-    for (let problem of problemResult) {
-      result.push(<tr>
-        <td>{problem.level+ "/" + problem.problemId}</td>
-        <td>{problem.titleKo}</td>
-        <td>{problem.acceptedUserCount}</td>
-        <td>{problem.averageTries}</td>
-      </tr>);
+    const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
+
+    for (let i = 0; i < 5; i++) {
+      result.push(<ToggleButton checked={problemLevel === i} title={text[i]}
+                                onClick={() => changeProblemLevel(i)}/>);
     }
-
-    if (problemResult.length === 0)
-      result.push(<li>조건을 만족하는 문제가 없습니다</li>)
-
     return result;
   }
 
@@ -206,16 +188,8 @@ function App() {
         <button onClick={findProblems}>문제 찾기</button>
 
         <h2>추천 문제</h2>
-        <table>
-          <tr>
-            <th>#</th>
-            <th>제목</th>
-            <th>해결</th>
-            <th>평균 시도</th>
-          </tr>
+        <SearchedList problemList={problemResult}/>
 
-          {widgetsSearchedProblems()}
-        </table>
       </div>
     </div>
   );
