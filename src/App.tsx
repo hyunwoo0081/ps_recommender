@@ -105,15 +105,45 @@ function App() {
 
   function findProblems() {
     LevelCalculator.analyzeUserData(userInfo);
-    let range = LevelCalculator.getLevelRange(searchField, problemLevel);
+
+    let searchArray: Array<number> = [];
+    if (!tryNewField) {
+      for (let i in tagCounts) {
+        if (tagCounts[i] === userInfo.length)
+          searchArray.push(parseInt(i));
+      }
+    }
+    else
+      searchArray = searchField;
+
+    if (searchArray.length === 0) {
+      setProblemResult([]);
+      return
+    }
+
+    let ranges = LevelCalculator.getLevelRange(searchArray, problemLevel);
 
     // make solved.ac query
-    let query = "";
-    for (let user of userInfo)
-      query += "!%40"+user.name+"%26";
-    for (let i in searchField)
-      query += "%23"+tagName[i].key+"%26";
-    query += "*"+range[0]+".."+range[1];
+    let query = "(";
+    for (let user of userInfo) {
+      if (userInfo[0].name !== user.name)
+        query += "%26";
+      query += "!@"+user.name;
+
+    }
+
+    if (ranges.length > 20) {
+      setProblemResult([]);
+    }
+
+    query += ")%26(";
+    for (let item of ranges) {
+      if (ranges[0].id !== item.id)
+        query += "|";
+      query += `%23${tagName[item.id].key}%26*${item.min}..${item.max}`;
+    }
+    query += ")";
+    console.log(query);
 
     Fetch.getRandomProblems100(query, (data: Array<any>) => {
       setProblemResult(data);
@@ -123,20 +153,20 @@ function App() {
   //get Widgets
   function widgetsUserCards() {
     let result = [];
-    for (let i in userInfo) {
-      let info = userInfo[i];
-      result.push(<UserCard user={info} userUpdated={userUpdated[i]} deleteHandler={deleteUser}/>);
-    }
-
+    for (let i in userInfo)
+      result.push(<UserCard key={i}
+                            user={userInfo[i]}
+                            userUpdated={userUpdated[i]}
+                            deleteHandler={deleteUser}/>);
     return result;
   }
 
   function widgetsFieldCard() {
     let result = [];
-    for (let i of searchField) {
-      let tag = tagName[i];
-      result.push(<FieldCard key={i} tag={tag} deleteTag={() => deleteSearchField(i)}/>);
-    }
+    for (let i of searchField)
+      result.push(<FieldCard key={i}
+                             tag={tagName[i]}
+                             deleteTag={() => deleteSearchField(i)}/>);
     return result;
   }
 
@@ -177,7 +207,6 @@ function App() {
 
         <h2>추천 문제</h2>
         <SearchedList problemList={problemResult}/>
-
       </div>
     </div>
   );

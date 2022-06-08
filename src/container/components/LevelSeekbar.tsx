@@ -6,16 +6,11 @@ interface Iprops {
 }
 
 const LevelSeekbar = ({value, handle} :Iprops) => {
-  function onChange(e: any) {
-    const val = e.target.value;
-    handle(val);
-  }
-
   function widgetsLabel() {
     let result = [];
     const text = ["쉬움", "약간 쉬움", "보통", "약간 어려움", "어려움"];
     for (let label of text)
-      result.push(<p>{label}</p>);
+      result.push(<p key={label}>{label}</p>);
 
     return result;
   }
@@ -28,7 +23,7 @@ const LevelSeekbar = ({value, handle} :Iprops) => {
              step="number"
              list="seekbar_list"
              value={value}
-             onChange={onChange}/>
+             onChange={(e) => handle(parseInt(e.target.value))}/>
       <div className="label_layout">
         {widgetsLabel()}
       </div>

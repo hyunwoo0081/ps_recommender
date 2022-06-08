@@ -5,8 +5,6 @@ interface Iprops {
 }
 
 const SearchedRow = ({problem} :Iprops) => {
-  //`https://www.acmicpc.net/problem/${problem.problemId}`
-  // problem.isLevelLocked //standard problem
   return (
     <tr>
       <td>

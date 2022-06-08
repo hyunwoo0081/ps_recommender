@@ -4,10 +4,7 @@ import TagImg from "container/static/tag.png";
 import XImg from "container/static/xb.png";
 
 interface Iprops {
-  tag: {
-    key: string
-    ko: string
-  }
+  tag: { key: string, ko: string }
   deleteTag: Function
 }
 
@@ -20,7 +17,6 @@ const FieldCard = ({tag, deleteTag}: Iprops) => {
       <button onClick={() => deleteTag()}>
         <img src={XImg} alt="x"/>
       </button>
-
     </div>
   );
 }
