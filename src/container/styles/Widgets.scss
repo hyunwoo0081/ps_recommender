@@ -63,6 +63,21 @@ button {
   }
 }
 
+.footer_bar {
+  background-color: #2D2D2D;
+  height: auto;
+
+  .footer_layout {
+    max-width: 1140px;
+    padding: 60px 0;
+    margin: 0 auto;
+    a {
+      text-decoration: none;
+      color: white;
+    }
+  }
+}
+
 .search_bar_layout {
   display: flex;
   position: relative;

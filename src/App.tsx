@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import NavigationBar from "container/components/NavigationBar";
 import UserSearchBar from "container/components/UserSearchBar";
@@ -8,6 +8,7 @@ import UserCard from "container/components/UserCard";
 import FieldCard from "container/components/FieldCard";
 import ToggleButton from "container/components/ToggleButton";
 import SearchedList from "./container/components/SearchedList";
+import Footer from "./container/components/Footer";
 
 import Fetch from "container/controller/Fetch";
 import LevelCalculator from "container/controller/LevelCalculator";
@@ -39,6 +40,10 @@ function App() {
   const [problemLevel, setProblemLevel]: [problemLevel: number, setProblemLevel: Function] = useState(2);
   const [searchField, setSearchField]: [searchField: Array<number>, setSearchField: Function] = useState([]);
   const [problemResult, setProblemResult]: [problemResult: Array<any>, setProblemResult: Function] = useState([]);
+  const [searchInfoChanged, setChanged] = useState(true);
+  const [cacheSearchArray, setCacheSearchArray]: [Array<number>, Function] = useState([]);
+  const [cacheSearchRanges, setCacheSearchRanges]: [Array<any>, Function] = useState([]);
+  const [cacheUserQuery, setCacheUserQuery]: [string, Function] = useState("");
 
   //`https://solved.ac/api/v3/user/show?handle=${name}`
   function init() {
@@ -103,47 +108,72 @@ function App() {
     setProblemLevel(level);
   }
 
-  function findProblems() {
-    LevelCalculator.analyzeUserData(userInfo);
+  useEffect(() => { setChanged(true); }, [userUpdated, tryNewField, problemLevel, searchField]);
 
-    let searchArray: Array<number> = [];
-    if (!tryNewField) {
-      for (let i in tagCounts) {
-        if (tagCounts[i] === userInfo.length)
-          searchArray.push(parseInt(i));
+  function findProblems() {
+    let searchArray, searchRanges, userQuery;
+    if (searchInfoChanged) {
+      LevelCalculator.analyzeUserData(userInfo);
+
+      if (tryNewField) {
+        searchArray = searchField;
+
+        let ranges = LevelCalculator.getLevelRange(searchArray, problemLevel);
+        searchRanges = [{id: -1, min:30, max:1}];
+        for (let level of ranges) {
+          searchRanges[0].min = Math.min(searchRanges[0].min, level.min);
+          searchRanges[0].max = Math.max(searchRanges[0].max, level.max);
+        }
       }
+      else {
+        searchArray = [];
+        for (let i in tagCounts) {
+          if (tagCounts[i] === userInfo.length)
+            searchArray.push(parseInt(i));
+        }
+
+        searchRanges = LevelCalculator.getLevelRange(searchArray, problemLevel);
+      }
+
+      //make user query
+      userQuery = "(";
+      for (let user of userInfo) {
+        if (user.name !== userInfo[0].name)
+          userQuery += "%26";
+        userQuery += "!@"+user.name;
+      }
+
+      setCacheSearchArray(searchArray);
+      setCacheSearchRanges(searchRanges);
+      setCacheUserQuery(userQuery);
+      setChanged(false);
     }
-    else
-      searchArray = searchField;
+    else {
+      searchArray = cacheSearchArray;
+      searchRanges = cacheSearchRanges;
+      userQuery = cacheUserQuery;
+    }
 
     if (searchArray.length === 0) {
       setProblemResult([]);
       return
     }
 
-    let ranges = LevelCalculator.getLevelRange(searchArray, problemLevel);
-
     // make solved.ac query
-    let query = "(";
-    for (let user of userInfo) {
-      if (userInfo[0].name !== user.name)
-        query += "%26";
-      query += "!@"+user.name;
+    let query = userQuery + ")%26(";
 
+    if (tryNewField) {
+      for (let item of searchArray)
+        query += `%23${tagName[item].key}%26`;
+      query += `*${searchRanges[0].min}..${searchRanges[0].max})`;
     }
+    else {
+      let randIndex = Math.floor(Math.random() * searchArray.length);
 
-    if (ranges.length > 20) {
-      setProblemResult([]);
+      const tag = tagName[searchArray[randIndex]].key;
+      const range = searchRanges[randIndex];
+      query += `%23${tag}%26*${range.min}..${range.max})`;
     }
-
-    query += ")%26(";
-    for (let item of ranges) {
-      if (ranges[0].id !== item.id)
-        query += "|";
-      query += `%23${tagName[item.id].key}%26*${item.min}..${item.max}`;
-    }
-    query += ")";
-    console.log(query);
 
     Fetch.getRandomProblems100(query, (data: Array<any>) => {
       setProblemResult(data);
@@ -208,6 +238,8 @@ function App() {
         <h2>추천 문제</h2>
         <SearchedList problemList={problemResult}/>
       </div>
+
+      <Footer/>
     </div>
   );
 }

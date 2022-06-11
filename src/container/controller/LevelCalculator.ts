@@ -11,7 +11,7 @@ const LevelCalculator = {
     let userMeans = [];
     if (userInfo.length === 0) return;
 
-    // 각 유저마다 분야별 평균 구하기
+    // calculate user mean
     for (let user of userInfo) {
       let means = [];
       for (let info of user.solvedField) {
@@ -20,7 +20,7 @@ const LevelCalculator = {
       userMeans.push(means);
     }
 
-    // 분야 별 평균과 표준편차 구하기
+    // calculate field mean stdDiv
     let mean = Array.from({length: userMeans[0].length}, () => 0);
     let stdDev = Array.from({length: userMeans[0].length}, () => 0);
 
@@ -48,8 +48,6 @@ const LevelCalculator = {
       min = Math.min(Math.max(1, min), 30);
       max = Math.min(Math.max(1, max), 30);
       result.push({id: id, min: min, max: max});
-
-      console.log(this.mean[id], problemLevel);
     }
     return result;
   }
