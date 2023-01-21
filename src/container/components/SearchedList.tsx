@@ -4,13 +4,14 @@ import SearchedRow from "./SearchedRow";
 
 interface Iprops {
   problemList: Array<any>
+  showLevel: boolean
 }
 
-const SearchedList = ({problemList} :Iprops) => {
+const SearchedList = ({problemList, showLevel} :Iprops) => {
   function widgetsSearchedProblems() {
     let result = [];
     for (let problem of problemList)
-      result.push(<SearchedRow key={problem.problemId} problem={problem}/>);
+      result.push(<SearchedRow key={problem.problemId} problem={problem} showLevel = {showLevel}/>);
 
     return result;
   }

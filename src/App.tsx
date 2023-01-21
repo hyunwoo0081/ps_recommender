@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 
 import NavigationBar from "container/components/NavigationBar";
 import UserSearchBar from "container/components/UserSearchBar";
@@ -44,6 +44,10 @@ function App() {
   const [cacheSearchArray, setCacheSearchArray]: [Array<number>, Function] = useState([]);
   const [cacheSearchRanges, setCacheSearchRanges]: [Array<any>, Function] = useState([]);
   const [cacheUserQuery, setCacheUserQuery]: [string, Function] = useState("");
+
+  // user setting params
+  const [showLevel, setShowLevel]: [showLevel: boolean, setShowLevel: Function] = useState(true);
+
 
   //`https://solved.ac/api/v3/user/show?handle=${name}`
   function init() {
@@ -176,6 +180,7 @@ function App() {
     }
 
     Fetch.getRandomProblems100(query, (data: Array<any>) => {
+      // 못푸는 알고리즘 제거 기능 추가 바람
       setProblemResult(data);
     });
   }
@@ -198,6 +203,13 @@ function App() {
                              tag={tagName[i]}
                              deleteTag={() => deleteSearchField(i)}/>);
     return result;
+  }
+
+  // user setting functions
+  function onChangeShowLevel(e: ChangeEvent<HTMLInputElement>) {
+    const checked: boolean = e.target.checked
+
+    setShowLevel(checked);
   }
 
   return (
@@ -232,11 +244,16 @@ function App() {
 
           <LevelSeekbar value={problemLevel} handle={changeProblemLevel}/>
         </div>
-
+        <div>
+          <label>
+            <input type='checkbox' checked={showLevel} onChange={onChangeShowLevel}/>
+            문제 난이도 보이기
+          </label>
+        </div>
         <button onClick={findProblems}>문제 찾기</button>
 
         <h2>추천 문제</h2>
-        <SearchedList problemList={problemResult}/>
+        <SearchedList problemList={problemResult} showLevel={showLevel}/>
       </div>
 
       <Footer/>

@@ -2,14 +2,18 @@ import React from 'react';
 
 interface Iprops {
   problem: any
+  showLevel: boolean
 }
 
-const SearchedRow = ({problem} :Iprops) => {
+const SearchedRow = ({problem, showLevel} :Iprops) => {
   return (
     <tr>
       <td>
         <div>
-          <img src={`https://static.solved.ac/tier_small/${problem.level}.svg`} alt={problem.level}/>
+          {showLevel ?
+            <img src={`https://static.solved.ac/tier_small/${problem.level}.svg`} alt={problem.level}/>
+            : null
+          }
           <a href={`https://www.acmicpc.net/problem/${problem.problemId}`} target="_blank" rel="noreferrer">
             {problem.problemId}</a>
         </div>
