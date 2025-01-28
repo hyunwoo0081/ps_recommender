@@ -1,7 +1,6 @@
 import React from 'react';
 
 import SearchBar from "./SearchBar";
-import TagImg from "container/static/tag.png";
 
 interface Iprops {
   tagList: Array<{ ko: string, key: string }>
@@ -27,7 +26,7 @@ const TagSearchBar = ({tagList, addTag} :Iprops) => {
     let searched = [];
     for (let i = 0; i < Math.min(5, searchedList.length); i++) {
       let tag = tagList[searchedList[i]];
-      searched.push({img: TagImg, title: tag.ko, subTitle: tag.key});
+      searched.push({img: "/tag.png", title: tag.ko, subTitle: tag.key});
     }
     setSearched(searched);
   }
@@ -37,7 +36,7 @@ const TagSearchBar = ({tagList, addTag} :Iprops) => {
   }
 
   return (
-    <SearchBar src={TagImg}
+    <SearchBar src="/tag.png"
                placeholder="태그를 입력하세요"
                searchHandle={changeSearchTag}
                addHandle={addHandle}/>

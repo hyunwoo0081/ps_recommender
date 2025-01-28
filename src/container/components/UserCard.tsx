@@ -1,7 +1,5 @@
 import React from 'react';
 
-import XImg from "container/static/xw.png";
-
 interface Iprops {
   user: {
     name: string
@@ -30,7 +28,7 @@ const UserCard = ({user, userUpdated, deleteHandler} :Iprops) => {
       </div>
       <button className="delete_user_card"
               onClick={() => deleteHandler(name)}>
-        <img src={XImg} alt="x"/>
+        <img src="/xw.png" alt="x"/>
       </button>
     </div>
   );

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import SearchBar from "./SearchBar";
-import NameImg from "container/static/name.png";
 import Fetch from "container/controller/Fetch";
 
 interface Iprops {
@@ -51,7 +50,7 @@ const UserSearchBar = ({addUserFrame}: Iprops) => {
   }
 
   return (
-    <SearchBar src={NameImg} placeholder={"사용자를 입력하세요"} searchHandle={changeSearchName} addHandle={addHandle}/>
+    <SearchBar src="/name.png" placeholder={"사용자를 입력하세요"} searchHandle={changeSearchName} addHandle={addHandle}/>
   );
 }
 
